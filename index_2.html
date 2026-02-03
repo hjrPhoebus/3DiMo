@@ -1,0 +1,506 @@
+<style>
+    .video-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 30px; /* 视频之间的间距 */
+    }
+    .caption-container {
+        margin-top: 8px;
+        font-family: "Google Sans", sans-serif;
+        font-size: 0.92rem; /* 字体稍微小一点，显得精致 */
+        line-height: 1.4;
+        text-align: center;
+        color: #4a4a4a;
+        max-width: 100%;
+        padding: 0 10px;
+    }
+    .caption-label {
+        font-weight: bold;
+        color: #333;
+    }
+    .caption-prompt {
+        font-style: italic;
+        color: #209cee; /* 使用学术蓝突出 Prompt */
+    }
+    .caption-divider {
+        margin: 0 8px;
+        color: #ccc; /* 分隔符颜色 */
+    }
+</style>
+
+<style>
+    .nvs-container {
+        /* 弹性布局，确保横向排列 */
+        display: flex;
+        flex-direction: row;
+        justify-content: center; /* 居中排列 */
+        align-items: center;     /* 垂直居中对齐 */
+        gap: 10px;               /* 视频之间的间距 */
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 40px;
+    }
+
+    .nvs-video {
+        /* 核心：高度固定，宽度自适应 */
+        height: 360px;           /* 你可以根据实际效果调整这个高度数值 */
+        width: auto;             
+        
+        /* 保险措施：防止四个视频加起来太宽超出容器 */
+        /* 如果视频都是竖屏(9:16)，这个限制通常不会触发 */
+        max-width: 24%;          
+        
+        border-radius: 4px;      /* 圆角稍微美化一下 */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 轻微阴影增加层次感 */
+    }
+
+    /* 移动端适配：如果在手机上看，自动换行变成2x2 */
+    @media (max-width: 768px) {
+        .nvs-container {
+            flex-wrap: wrap;
+        }
+        .nvs-video {
+            height: auto;
+            width: 48%; /* 一行两个 */
+            max-width: none;
+        }
+    }
+</style>
+
+
+
+
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <title>3DiMo: 3D-Aware Implicit Motion Control for View-Adaptive Human Video Generation</title>
+
+    <meta content="3DiMo: 3D-Aware Implicit Motion Control for View-Adaptive Human Video Generation" name="description" />
+    <meta content="summary" name="twitter:card" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+
+    <link href="static/css/template.css" rel="stylesheet" type="text/css" />
+    <link href="static/css/my_style.css" rel="stylesheet" type="text/css">
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        WebFont.load({
+            google: {
+                families: ["Lato:100,100italic,300,300italic,400,400italic,700,700italic,900,900italic", "Montserrat:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic", "Ubuntu:300,300italic,400,400italic,500,500italic,700,700italic", "Changa One:400,400italic", "Open Sans:300,300italic,400,400italic,600,600italic,700,700italic,800,800italic", "Varela Round:400", "Bungee Shade:regular", "Roboto:300,regular,500"]
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        ! function (o, c) {
+            var n = c.documentElement,
+                t = " w-mod-";
+            n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch")
+        }(window, document);
+    </script>
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+    <script type="text/javascript" src="static/js/zoom.js"></script>
+    <script type="text/javascript" src="static/js/video_comparison.js"></script>
+
+
+    <link rel="stylesheet" href="./static/css/bulma.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+    <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="./static/js/bulma-carousel.min.js"></script>
+    <script src="./static/js/index.js"></script>
+    
+
+</head>
+
+<body>
+
+    <div class="section hero nerf-_v2">
+        <div class="container-2 nerf_header_v2 w-container">
+            <h1 class="nerf_title_v2">3DiMo: 3D-Aware Implicit Motion Control for View-Adaptive Human Video Generation</h1>
+            
+            <div class="nerf_subheader_v2">
+                <div>
+                    <span class="nerf_affiliation_v2">Anonymous Authors</span>
+                </div>
+                
+                <div>
+                    <p class="nerf_affiliation_v2">CVPR 2026 Submission #18135</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <div class="white_section_nerf w-container">
+        <h2 class="grey-heading_nerf">Motion Reproduction with Text-Guided Camera Control</h2>
+        <div class="grid-container-1">
+            
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v2/motion_cam_9.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-L:</span> <span class="caption-prompt">"Handheld camera."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-R:</span> <span class="caption-prompt">"Camera arcs to the left."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves upward and tilts down."</span>
+                </div>
+            </div>
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v2/0003.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-L:</span> <span class="caption-prompt">"Static camera."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-M:</span> <span class="caption-prompt">"Camera arcs to the left."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-R:</span> <span class="caption-prompt">"Camera tilts upward."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves upward and tilts down."</span>
+                </div>
+            </div>
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v2/0011.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-L:</span> <span class="caption-prompt">"Camera moves left."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-R:</span> <span class="caption-prompt">"Camera tilts up."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera arcs to the left."</span>
+                </div>
+            </div>
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v2/0005.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-L:</span> <span class="caption-prompt">"Camera moves right."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-R:</span> <span class="caption-prompt">"Camera arcs to the right."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Static camera."</span>
+                </div>
+            </div>
+
+            
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v2/0001.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle:</span> <span class="caption-prompt">"Camera arcs to the right."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera arcs to the left."</span>
+                </div>
+            </div>
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v2/0009.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle:</span> <span class="caption-prompt">"Handheld camera"</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera tilts up and down"</span>
+    
+                </div>
+            </div>
+
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case4.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-L:</span> <span class="caption-prompt">"Camera arcs to the right."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-R:</span> <span class="caption-prompt">"Camera remains static."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera arcs to the left."</span>
+                </div>
+            </div>
+
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case8.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-L:</span> <span class="caption-prompt">"Camera suddenly zooms in."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-R:</span> <span class="caption-prompt">"Camera arcs left."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves upward while circling right."</span>
+                </div>
+            </div>
+
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v2/motion_cam_4.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle:</span> <span class="caption-prompt">"Camera moves backward, then arcs left."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera tilts down and arcs right."</span>
+                </div>
+            </div>
+
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case10.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-L:</span> <span class="caption-prompt">"Camera remains static."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Mid-R:</span> <span class="caption-prompt">"Camera slowly moves backward."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera slowly zooms in."</span>
+                </div>
+            </div>
+
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v2/0002.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle:</span> <span class="caption-prompt">"Camera arcs to the left."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves upward and tilts down slowly."</span>
+                </div>
+            </div>
+
+
+            <!-- <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets/motion_cam_7.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle:</span> <span class="caption-prompt">"Camera moves upward and tilts down."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves backward."</span>
+                </div>
+            </div> -->
+
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case7.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle:</span> <span class="caption-prompt">"Camera slowly zooms in."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves upward and tilts down."</span>
+                </div>
+            </div>
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case2.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle-L:</span> <span class="caption-prompt">"Camera arcs right slowly."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle-R:</span> <span class="caption-prompt">"Handheld camera."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves upward and slowly tilts down."</span>
+                </div>
+            </div>
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case1.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle-L:</span> <span class="caption-prompt">"Camera moves upward and slowly tilts down."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle-R:</span> <span class="caption-prompt">"Camera moves downward."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Handheld camera."</span>
+                </div>
+            </div>
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/0013.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle:</span> <span class="caption-prompt">"Handheld camera."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves downward and slowly tilts up."</span>
+                    
+                </div>
+            </div>
+
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/0008.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+                
+                <div class="caption-container">
+                    <span class="caption-label">Left:</span> Source Motion
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Middle:</span> <span class="caption-prompt">"Camera moves downward and slowly tilts up."</span>
+                    <span class="caption-divider">|</span>
+                    <span class="caption-label">Right:</span> <span class="caption-prompt">"Camera moves upward and slowly tilts down."</span>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+
+
+
+    
+    <div class="white_section_nerf w-container">
+        <h2 class="grey-heading_nerf">Broader Applications</h2>
+        <div class="grid-container-1">
+
+            <!-- Automatic Motion-Image Alignment -->
+        <p class="myprompt nerf_text">Automatic Motion-Image Alignment</p>
+
+        <div class="three-video-row">
+            
+            <!-- Video 1 -->
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case14.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+            </div>
+
+            <!-- Video 2 -->
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case13.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+            </div>
+
+            <!-- Video 3 -->
+            <div class="video-block">
+                <video class="video" loop playsinline autoPlay muted controls
+                src="assets_v3/case12.mp4" onloadedmetadata="this.playbackRate=1" 
+                onplay="resizeAndPlay(this)"></video> 
+            </div>
+
+        </div>
+            
+            <!-- Title -->
+            <p class="myprompt nerf_text">Human Novel View Synthesis from a Single Image</p>
+
+            <!-- 4 Videos Container -->
+            <div class="nvs-container">
+                <!-- Video 1 -->
+                <video class="nvs-video" loop playsinline autoPlay muted controls
+                    src="assets/nvs_1.mp4" 
+                    onloadedmetadata="this.playbackRate=1"></video>
+
+                <!-- Video 2 -->
+                <video class="nvs-video" loop playsinline autoPlay muted controls
+                    src="assets/nvs_2.mp4" 
+                    onloadedmetadata="this.playbackRate=1"></video>
+
+                <!-- Video 3 -->
+                <video class="nvs-video" loop playsinline autoPlay muted controls
+                    src="assets/nvs_3.mp4"
+                    onloadedmetadata="this.playbackRate=1"></video>
+
+                <!-- Video 4 -->
+                <video class="nvs-video" loop playsinline autoPlay muted controls
+                    src="assets/nvs_4.mp4" 
+                    onloadedmetadata="this.playbackRate=1"></video>
+            </div>
+
+        </div>
+    <!-- </div> -->
+
+        <!-- Video Stabilization -->
+        <p class="myprompt nerf_text">Video Stabilization</p>
+        <div>
+            <video class="video" id="10" loop playsinline autoPlay muted controls
+            src="assets_v2/0007.mp4" onloadedmetadata="this.playbackRate=1" 
+            onplay="resizeAndPlay(this)"></video> 
+        </div>
+
+        
+
+
+
+        </div>
+    </div>
+
+
+</body>
+<footer>
+    This project page template is inspired by <a href="https://sweetdreamer3d.github.io/">SweetDreamer.</a>
+</footer>
+
+</html>
